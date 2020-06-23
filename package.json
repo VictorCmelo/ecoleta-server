@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "engines": {
-    "node": "12.11.1"
+    "node": "12.16.1"
     },
   "scripts": {
+    "start": "ts-node src/server.ts",
     "dev": "ts-node-dev --transpileOnly --ignore-watch node_modules src/server.ts",
     "knex:seed": "knex  --knexfile knexfile.ts seed:run",
     "knex:migrate": "knex --knexfile knexfile.ts migrate:latest"

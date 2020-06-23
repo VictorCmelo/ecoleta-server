@@ -22,7 +22,7 @@ class PointsController {
       const serializedPoints = points.map( item => {
         return {
          ...item,
-          image_url: `http://192.168.1.14:3333/uploads/${item.image}`,
+          image_url: `https://server-ecoleta-base.herokuapp.com/uploads/${item.image}`,
         };
       });
      
@@ -40,7 +40,7 @@ class PointsController {
 
     const serializedPoints = {
        ...point,
-        image_url: `http://192.168.1.14:3333/uploads/${point.image}`,
+        image_url: `https://server-ecoleta-base.herokuapp.com/uploads/${point.image}`,
       };
    
 

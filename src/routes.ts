@@ -17,6 +17,7 @@ routes.get("/items", intemsController.index);
 
 routes.get('/points/:id', pointsController.show);
 routes.get('/points', pointsController.index);
+routes.get("/", pointsController.indexAll);
 
 
 routes.post(

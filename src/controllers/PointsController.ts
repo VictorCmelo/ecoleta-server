@@ -29,6 +29,25 @@ class PointsController {
     return response.json(serializedPoints);
   }
 
+  async indexAll(request : Request, response : Response){
+    
+
+    const points = await knex('points')
+    .join('point_itens', 'points.id', '=', 'point_itens.point_id')
+    .distinct()
+    .select('points.*');
+
+
+    const serializedPoints = points.map( item => {
+      return {
+       ...item,
+        image_url: `https://server-ecoleta-base.herokuapp.com/uploads/${item.image}`,
+      };
+    });
+   
+  return response.json(serializedPoints);
+}
+
   async show(request : Request, response : Response){
     const {id} = request.params;
 

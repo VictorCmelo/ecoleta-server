@@ -1,36 +1,18 @@
-import path from "path";
+import path from 'path';
 
 module.exports = {
-  development: {
-    client: "pg",
-    connection: {
-      database: "ecoleta",
-      user: "postgres",
-      password: "docker",
-    },
-    migrations: {
-      directory: path.resolve(__dirname, "src", "database", "migrations"),
-    },
-    seeds: {
-      directory: path.resolve(__dirname, "src", "database", "seeds"),
-    },
-
-    useNullAsDefault: true,
+  client:'pg',
+  connection:{
+    database: "ecoleta",
+    user:"gmowfwbqtlbyon",
+    password: "1b4c0b9f95ba164c54deebf5a97355e02371816a8dacc354c748cfe86fc09cc1"
   },
-  production: {
-    client: "pg",
-    connection: {
-      database: "ecoleta",
-      user: "gmowfwbqtlbyon",
-      password: "1b4c0b9f95ba164c54deebf5a97355e02371816a8dacc354c748cfe86fc09cc1",
-    },
-    migrations: {
-      directory: path.resolve(__dirname, "src", "database", "migrations"),
-    },
-    seeds: {
-      directory: path.resolve(__dirname, "src", "database", "seeds"),
-    },
-
-    useNullAsDefault: true,
-  }
+  migrations: {
+    directory: path.resolve(__dirname, 'src', 'database', 'migrations')
+  },
+  seeds: {
+    directory: path.resolve(__dirname, 'src', 'database', 'seeds')
+  },
+  
+  useNullAsDefault:true,
 };

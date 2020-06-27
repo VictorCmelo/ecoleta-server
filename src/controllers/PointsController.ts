@@ -1,77 +1,71 @@
-import { Request, Response } from 'express';
-import knex from '../database/connection';
+import { Request, Response } from "express";
+import knex from "../database/connection";
 
 class PointsController {
+  async index(request: Request, response: Response) {
+    const { city, uf, items } = request.query;
 
-  async index(request : Request, response : Response){
-      const { city, uf, items } = request.query;
+    const parsedItems = String(items)
+      .split(",")
+      .map((item) => Number(item.trim()));
 
-      const parsedItems = String(items)
-      .split(',')
-      .map(item => Number(item.trim()));
-
-      const points = await knex('points')
-      .join('point_itens', 'points.id', '=', 'point_itens.point_id')
-      .whereIn('point_itens.item_id', parsedItems)
-      .where('city', String(city))
-      .where('uf', String(uf))
+    const points = await knex("points")
+      .join("point_itens", "points.id", "=", "point_itens.point_id")
+      .whereIn("point_itens.item_id", parsedItems)
+      .where("city", String(city))
+      .where("uf", String(uf))
       .distinct()
-      .select('points.*');
+      .select("points.*");
 
-
-      const serializedPoints = points.map( item => {
-        return {
-         ...item,
-          image_url: `https://server-ecoleta-base.herokuapp.com/uploads/${item.image}`,
-        };
-      });
-     
-    return response.json(serializedPoints);
-  }
-
-  async indexAll(request : Request, response : Response){
-    
-
-    const points = await knex('points')
-    .join('point_itens', 'points.id', '=', 'point_itens.point_id')
-    .distinct()
-    .select('points.*');
-
-
-    const serializedPoints = points.map( item => {
+    const serializedPoints = points.map((item) => {
       return {
-       ...item,
+        ...item,
         image_url: `https://server-ecoleta-base.herokuapp.com/uploads/${item.image}`,
       };
     });
-   
-  return response.json(serializedPoints);
-}
 
-  async show(request : Request, response : Response){
-    const {id} = request.params;
+    return response.json(serializedPoints);
+  }
 
-    const point = await knex('points').where('id', id).first();
+  async indexAll(request: Request, response: Response) {
+    const points = await knex("points")
+      .join("point_itens", "points.id", "=", "point_itens.point_id")
+      .distinct()
+      .select("points.*");
 
-    if(!point){
-      return response.status(400).json({message: 'Point not found' });
+    const serializedPoints = points.map((item) => {
+      return {
+        ...item,
+        image_url: `https://server-ecoleta-base.herokuapp.com/uploads/${item.image}`,
+      };
+    });
+
+    return response.json(serializedPoints);
+  }
+
+  async show(request: Request, response: Response) {
+    const { id } = request.params;
+
+    const point = await knex("points").where("id", id).first();
+
+    if (!point) {
+      return response.status(400).json({ message: "Point not found" });
     }
 
     const serializedPoints = {
-       ...point,
-        image_url: `https://server-ecoleta-base.herokuapp.com/uploads/${point.image}`,
-      };
-   
+      ...point,
+      image_url: `https://server-ecoleta-base.herokuapp.com/uploads/${point.image}`,
+    };
 
-    const items = await knex('items')
-    .join('point_itens', 'items.id', '=', 'point_itens.item_id')
-    .where('point_itens.point_id', id)
-    .select('items.title');
+    const items = await knex("items")
+      .join("point_itens", "items.id", "=", "point_itens.item_id")
+      .where("point_itens.point_id", id)
+      .select("items.title");
 
-    return response.json({point: serializedPoints, items});
+    return response.json({ point: serializedPoints, items });
   }
 
-  async create(request : Request, response : Response) {
+  async create(request: Request, response: Response) {
     const {
       name,
       email,
@@ -82,43 +76,49 @@ class PointsController {
       uf,
       items
     } = request.body;
-  
-    const trx = await knex.transaction();
-  
-    const point = {
-      image: request.file.filename,
-      name,
-      email,
-      whatsapp,
-      latitude,
-      longitude,
-      city,
-      uf
-    };
 
-    const insertedIds = await trx('points').insert(point);
-  
-    const point_id = insertedIds[0];
-  
-    const pointItens = items
-    .split(',')
-    .map((item: string) => Number(item.trim()) )
-    .map((item_id : number) => {
-      return {
-        item_id,
-        point_id,
-      };
-    })
-  
-    await trx('point_itens').insert(pointItens);
-  
-    await trx.commit();
+    try {
+     
+      await knex.transaction(async (trx) => {
+        const point = {
+          image: request.file.filename,
+          name,
+          email,
+          whatsapp,
+          latitude,
+          longitude,
+          city,
+          uf,
+        };
 
-    return response.json({ 
-      id: point_id,
-      ...point 
-     });
+        const insertedIds = await trx('points').returning('id').insert(point);
+
+        const point_id = insertedIds[0];
+
+        const pointItens = items
+          .split(",")
+          .map((item: string) => Number(item.trim()))
+          .map((item_id: number) => {
+            return {
+              item_id,
+              point_id,
+            };
+          });
+
+          console.log(pointItens);
+        await trx('point_itens').insert(pointItens);
+
+        return response.json({
+          id: point_id,
+          ...point,
+        });
+      });
+
+    
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 
-export default PointsController; 
+export default PointsController;

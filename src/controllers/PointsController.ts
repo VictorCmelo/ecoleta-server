@@ -104,8 +104,7 @@ class PointsController {
               point_id,
             };
           });
-
-          console.log(pointItens);
+     
         await trx('point_itens').insert(pointItens);
 
         return response.json({

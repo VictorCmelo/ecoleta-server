@@ -1,1 +1,1 @@
-web:knex migrate:rollback  && knex migrate:latest && knex seed: run && yarn start
+web:knex migrate:rollback  && yarn knex:migrate  && yarn knex:seed && yarn start
